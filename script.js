@@ -340,7 +340,7 @@ class PomodoroApp {
             this.el.sessionDots.appendChild(dot);
         }
 
-        this.el.taskIdxLabel.textContent = this.tasks.length;
+        this.el.taskIdxLabel.textContent = this.currentTaskIndex + 1;
     }
 
     renderGrid() {
