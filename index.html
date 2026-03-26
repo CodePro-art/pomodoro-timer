@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,11 +17,9 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <span>History</span>
-                </a>
-                <a href="#" class="nav-item">
+                <!-- Hidden inputs for file uploads used in Phase 2 -->
+                <input type="file" id="avatar-upload" accept="image/*" style="display:none">
+                <a href="#" class="nav-item" id="sidebar-profile-btn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     <span>Profile</span>
                 </a>
@@ -33,108 +31,131 @@
             <!-- Header -->
             <header class="top-bar">
                 <h1 class="page-title">Dashboard</h1>
-                <div class="user-profile">
+                <div class="user-profile" id="user-profile-widget" style="cursor: pointer;">
                     <div class="avatar-container">
-                        <img src="https://i.pravatar.cc/150?u=sarah" alt="User Avatar" class="avatar-image">
+                        <img src="" alt="User Avatar" class="avatar-image" id="top-avatar-img" style="display: none;">
+                        <div class="avatar-generic" id="top-avatar-generic">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
                         <span class="status-dot"></span>
                     </div>
                     <div class="user-info">
-                        <span class="user-name">Sarah K.</span>
-                        <span class="user-status">Focusing...</span>
+                        <span class="user-name" id="top-user-name">Guest User</span>
+                        <span class="user-status">Click to login...</span>
                     </div>
                 </div>
             </header>
 
             <!-- Workspace -->
             <div class="workspace">
-                <!-- Background decorative cards -->
-                <div class="bg-card card-left">
-                    <h3>Cast...</h3>
-                    <div class="bg-ring ring-cyan"></div>
-                </div>
-                <div class="bg-card card-right">
-                    <div class="bg-ring ring-purple"></div>
-                </div>
-                <div class="bg-card card-bottom">
-                    <h3>Rese...</h3>
-                </div>
+                <!-- Multi-Task Carousel Container -->
+                <div class="carousel-container">
+                    <button class="carousel-arrow left-arrow" id="prev-task-btn" aria-label="Previous Task">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
 
-                <!-- Central Authentic Glass Card -->
-                <div class="pomodoro-card">
-                    <!-- Top header inside card -->
-                    <div class="card-header">
-                        <button class="icon-btn settings-btn" id="settings-toggle-btn" aria-label="Settings">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                        </button>
-                        <div class="card-title-group">
-                            <h2 class="card-title">POMODORO FOCUS</h2>
-                            <p class="card-subtitle">STAY PRODUCTIVE</p>
+                    <!-- Central Authentic Glass Card -->
+                    <div class="pomodoro-card">
+                        <!-- Top header inside card -->
+                        <div class="card-header">
+                            <button class="icon-btn settings-btn" id="settings-toggle-btn" aria-label="Settings">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            </button>
+                            <div class="card-title-group">
+                                <input type="text" class="task-name-input" id="current-task-name" value="POMODORO FOCUS" title="Edit Task Name (Multi-session)">
+                                
+                                <div class="front-edit-time">
+                                    <label for="front-time-input">Limit: </label>
+                                    <input type="number" id="front-time-input" value="25" min="1" max="120">
+                                    <span>min</span>
+                                </div>
+                            </div>
+                            <!-- Calendar Schedule Mock Button -->
+                            <button class="icon-btn calendar-btn" id="calendar-toggle-btn" aria-label="Schedule Task">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            </button>
                         </div>
-                        <button class="icon-btn stats-btn" aria-label="Statistics">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                        </button>
-                    </div>
 
-                    <!-- Hidden settings overlay -->
-                    <div class="settings-overlay hidden" id="settings-overlay">
-                        <label>Custom Time (min): <input type="number" id="custom-time-input" value="25" min="1" max="120"></label>
-                        <button id="save-settings" class="btn btn-outline" style="margin-top: 10px; width: 100%;">Save</button>
-                    </div>
-
-                    <!-- Circular Timer Display -->
-                    <div class="timer-circle-wrap">
-                        <svg class="progress-ring-svg" viewBox="0 0 300 300">
-                            <!-- Inner dark track -->
-                            <circle class="ring-track" cx="150" cy="150" r="130"></circle>
-                            <!-- Animated glow progress -->
-                            <circle class="ring-progress" id="progress-circle" cx="150" cy="150" r="130"></circle>
-                        </svg>
-                        
-                        <div class="timer-center-text">
-                            <div class="time-main" id="time-display">25:00</div>
-                            <div class="time-sub">MINUTES REMAINING</div>
-                            <div class="session-info">Focus Session <span id="current-session-label">1</span>/4</div>
+                        <!-- Powerful overlay settings -->
+                        <div class="settings-overlay hidden" id="settings-overlay">
+                            <h3>Settings & Theming</h3>
+                            <div class="setting-row">
+                                <label>Theme:</label>
+                                <select id="theme-selector">
+                                    <option value="dark">Dark Space (Default)</option>
+                                    <option value="light">Crisp Light</option>
+                                    <option value="ocean">Ocean Breeze</option>
+                                    <option value="sunset">Sunset Glow</option>
+                                    <option value="slate">Slate Minimal</option>
+                                </select>
+                            </div>
+                            <div class="setting-row">
+                                <label>Alarm Sound:</label>
+                                <select id="sound-selector">
+                                    <!-- Options generated by JS -->
+                                </select>
+                                <button class="btn btn-outline preview-sound-btn" id="preview-sound-btn">▶ Test</button>
+                            </div>
+                            <button id="close-settings" class="btn btn-outline" style="margin-top: 15px; width: 100%;">Apply & Close</button>
                         </div>
-                    </div>
 
-                    <!-- Action Controls -->
-                    <div class="controls-row">
-                        <div class="btn-group">
+                        <!-- Hidden Login Modal Overlay -->
+                        <div class="login-overlay hidden" id="login-overlay">
+                            <h3>Profile Setup</h3>
+                            <label>Your Name:</label>
+                            <input type="text" id="login-name-input" placeholder="e.g. Sarah K." class="form-input">
+                            <label>Avatar Upload:</label>
+                            <button class="btn btn-outline" id="upload-avatar-btn">Choose Image...</button>
+                            <button id="save-login-btn" class="btn btn-primary" style="margin-top: 15px; width: 100%;">Save Profile</button>
+                        </div>
+
+                        <!-- MASSIVE X2 Circular Timer Display -->
+                        <div class="timer-circle-wrap massive-timer">
+                            <svg class="progress-ring-svg" viewBox="0 0 600 600">
+                                <circle class="ring-track" cx="300" cy="300" r="280"></circle>
+                                <circle class="ring-progress" id="progress-circle" cx="300" cy="300" r="280"></circle>
+                            </svg>
+                            
+                            <div class="timer-center-text">
+                                <div class="time-main" id="time-display">25:00</div>
+                                <div class="time-sub">MINUTES REMAINING</div>
+                                <div class="session-info">Focus Session <span id="current-session-label">1</span>/4</div>
+                            </div>
+                        </div>
+
+                        <!-- Action Controls (Removed 24px/32px texts) -->
+                        <div class="controls-row">
                             <button class="btn btn-outline" id="pause-btn" disabled>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
                                 <span>PAUSE</span>
                             </button>
-                            <span class="btn-subtext">24px</span>
-                        </div>
 
-                        <div class="btn-group">
-                            <button class="btn btn-primary" id="play-btn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            <button class="btn btn-primary btn-large" id="play-btn">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                 <span>PLAY</span>
                             </button>
-                            <span class="btn-subtext">32px</span>
-                        </div>
 
-                        <div class="btn-group">
                             <button class="btn btn-outline" id="reset-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
                                 <span>RESET</span>
                             </button>
-                            <span class="btn-subtext">24px</span>
                         </div>
-                    </div>
 
-                    <!-- Bottom tracker -->
-                    <div class="session-tracker">
-                        <span class="tracker-label">Active Session</span>
-                        <div class="dots-container" id="session-dots">
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
+                        <!-- Bottom tracker -->
+                        <div class="session-tracker">
+                            <span class="tracker-label">Active Session</span>
+                            <div class="dots-container" id="session-dots">
+                                <!-- Dots populated by JS -->
+                            </div>
+                            <div class="task-indicator-label">
+                                Task <span id="task-idx-label">1</span>/10
+                            </div>
                         </div>
-                        <span class="tracker-target">Target: 4 Sessions</span>
-                    </div>
+                    </div><!-- End pomodoro-card -->
+
+                    <button class="carousel-arrow right-arrow" id="next-task-btn" aria-label="Next Task">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
                 </div>
             </div>
         </main>
