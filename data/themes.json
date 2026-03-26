@@ -1,0 +1,7 @@
+[
+  { "id": "dark", "name": "Dark Space (Default)" },
+  { "id": "light", "name": "Crisp Light" },
+  { "id": "ocean", "name": "Ocean Breeze" },
+  { "id": "sunset", "name": "Sunset Glow" },
+  { "id": "slate", "name": "Slate Minimal" }
+]

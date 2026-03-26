@@ -10,8 +10,9 @@ class PomodoroApp {
         this.colorEnd = [255, 51, 102];
         this.circleCircumference = 2 * Math.PI * 280; // r=280 now!
         
-        this.audioContext = null;
-        this.selectedSoundIndex = 0;
+        this.selectedSoundIndex = "0";
+        this.themeData = [];
+        this.soundData = [];
         
         // User Profile State
         this.userProfile = {
@@ -66,13 +67,14 @@ class PomodoroApp {
         };
     }
 
-    init() {
+    async init() {
         this.loadState();
         if (this.tasks.length === 0) {
             this.addNewTask("POMODORO FOCUS");
         }
         
-        this.populateSounds();
+        await this.fetchAPIData();
+        
         this.applyProfile();
         this.attachEventListeners();
         
@@ -82,6 +84,47 @@ class PomodoroApp {
         this.globalTimerId = setInterval(() => this.engineTick(), 1000);
         
         this.switchTask(0); // Render initial task
+    }
+
+    async fetchAPIData() {
+        try {
+            // Themes API Fetch
+            const themesRes = await fetch('data/themes.json');
+            this.themeData = await themesRes.json();
+            
+            this.el.themeSelector.innerHTML = '';
+            this.themeData.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
+                this.el.themeSelector.appendChild(opt);
+            });
+            
+            // Reapply saved theme selection
+            const savedTheme = localStorage.getItem('pomodoro_theme') || 'dark';
+            this.el.themeSelector.value = savedTheme;
+            this.el.html.setAttribute('data-theme', savedTheme);
+
+            // Sounds API Fetch
+            const soundsRes = await fetch('data/sounds.json');
+            this.soundData = await soundsRes.json();
+            
+            this.el.soundSelector.innerHTML = '';
+            this.soundData.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                this.el.soundSelector.appendChild(opt);
+            });
+            
+            // Reapply saved sound selection
+            const savedSound = localStorage.getItem('pomodoro_sound') || "0";
+            this.el.soundSelector.value = savedSound;
+            this.selectedSoundIndex = savedSound;
+
+        } catch (e) {
+            console.error("API Call Failed:", e);
+        }
     }
 
     // --- State Management ---
@@ -117,18 +160,7 @@ class PomodoroApp {
         if (savedProfile) {
             try { this.userProfile = JSON.parse(savedProfile); } catch(e) { }
         }
-        
-        const savedTheme = localStorage.getItem('pomodoro_theme');
-        if (savedTheme) {
-            this.el.html.setAttribute('data-theme', savedTheme);
-            this.el.themeSelector.value = savedTheme;
-        }
-        
-        const savedSound = localStorage.getItem('pomodoro_sound');
-        if (savedSound) {
-            this.selectedSoundIndex = parseInt(savedSound, 10);
-            this.el.soundSelector.value = this.selectedSoundIndex;
-        }
+        // Removed direct assignment to dropdowns here. It's handled confidently inside fetchAPIData().
     }
 
     // --- Core Engine & UI Render ---
@@ -306,14 +338,17 @@ class PomodoroApp {
             this.el.settingsOverlay.classList.toggle('hidden');
             this.el.loginOverlay.classList.add('hidden');
         });
+        
         this.el.closeSettingsBtn.addEventListener('click', () => {
-            this.el.html.setAttribute('data-theme', this.el.themeSelector.value);
-            this.selectedSoundIndex = parseInt(this.el.soundSelector.value, 10);
+            const selectedTheme = this.el.themeSelector.value;
+            this.el.html.setAttribute('data-theme', selectedTheme);
+            this.selectedSoundIndex = this.el.soundSelector.value;
             this.saveState();
             this.el.settingsOverlay.classList.add('hidden');
         });
+        
         this.el.previewSoundBtn.addEventListener('click', () => {
-            this.playSound(parseInt(this.el.soundSelector.value, 10));
+            this.playSound(this.el.soundSelector.value);
         });
 
         // Login Overlay
@@ -359,129 +394,13 @@ class PomodoroApp {
         }
     }
 
-    // --- Web Audio 20-Sound Synthesizer Engine ---
-    populateSounds() {
-        const sounds = [
-            "1. Classic Double Beep", "2. Soft Marimba", "3. Bright Chime", "4. Digital Watch", "5. Analog Bell",
-            "6. Synth Pad Swell", "7. Deep Bass Pluck", "8. Ethereal Glass", "9. Gentle Tap", "10. Triangle Ding",
-            "11. Echoing Chime", "12. 8-Bit Jump", "13. Wooden Block", "14. Space Radar", "15. Mellow Electric Piano",
-            "16. Sci-Fi Pulse", "17. Crystal Resonate", "18. Sunrise Chord", "19. Arcade Coin", "20. Calming Om"
-        ];
-        sounds.forEach((snd, idx) => {
-            const option = document.createElement('option');
-            option.value = idx;
-            option.textContent = snd;
-            this.el.soundSelector.appendChild(option);
-        });
-    }
-
-    playSound(index) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        if (!this.audioContext) this.audioContext = new AudioContext();
-        const ctx = this.audioContext;
-        if (ctx.state === 'suspended') ctx.resume();
-        
-        // Procedural generator helper
-        const playOsc = (type, freq, timeOffset, duration, vol, decayMultiplier) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime + timeOffset);
-            
-            gain.gain.setValueAtTime(0, ctx.currentTime + timeOffset);
-            gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + timeOffset + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + timeOffset + duration * decayMultiplier);
-            
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(ctx.currentTime + timeOffset);
-            osc.stop(ctx.currentTime + timeOffset + duration);
-        };
-
-        // Switch to generate distinct 20 sounds algorithmically
-        switch(index) {
-            case 0: // Classic Double Beep
-                playOsc('sine', 800, 0, 0.5, 0.5, 1);
-                playOsc('sine', 800, 0.25, 0.5, 0.5, 1);
-                break;
-            case 1: // Marimba (Sine, fast decay)
-                playOsc('sine', 440, 0, 0.4, 0.8, 0.5);
-                playOsc('sine', 554, 0.15, 0.4, 0.6, 0.5);
-                break;
-            case 2: // Bright Chime 
-                playOsc('triangle', 1200, 0, 1.0, 0.4, 1.5);
-                playOsc('triangle', 1600, 0.1, 1.0, 0.2, 1.5);
-                break;
-            case 3: // Digital Watch
-                playOsc('square', 2400, 0, 0.1, 0.1, 0.1);
-                playOsc('square', 2400, 0.15, 0.1, 0.1, 0.1);
-                break;
-            case 4: // Analog Bell
-                playOsc('sine', 600, 0, 2.0, 0.6, 2.0);
-                playOsc('sine', 1200, 0, 1.5, 0.2, 1.5);
-                break;
-            case 5: // Synth Pad Swell
-                playOsc('sawtooth', 300, 0, 2.0, 0.2, 1.0); // Simple mock
-                break;
-            case 6: // Deep Bass Pluck
-                playOsc('sine', 100, 0, 0.5, 0.8, 0.3);
-                playOsc('triangle', 200, 0.05, 0.5, 0.4, 0.3);
-                break;
-            case 7: // Ethereal Glass
-                playOsc('sine', 2000, 0, 1.5, 0.3, 2.0);
-                playOsc('sine', 2500, 0.2, 1.5, 0.2, 2.0);
-                break;
-            case 8: // Gentle Tap
-                playOsc('triangle', 300, 0, 0.1, 0.6, 0.2);
-                break;
-            case 9: // Triangle Ding
-                playOsc('triangle', 880, 0, 1.5, 0.5, 1.2);
-                break;
-            case 10: // Echoing Chime
-                playOsc('sine', 1000, 0, 0.5, 0.5, 1);
-                playOsc('sine', 1000, 0.3, 0.5, 0.25, 1);
-                playOsc('sine', 1000, 0.6, 0.5, 0.1, 1);
-                break;
-            case 11: // 8-Bit Jump
-                playOsc('square', 400, 0, 0.2, 0.1, 0.5);
-                playOsc('square', 600, 0.1, 0.2, 0.1, 0.5);
-                break;
-            case 12: // Wooden Block
-                playOsc('square', 300, 0, 0.1, 0.5, 0.1);
-                break;
-            case 13: // Space Radar
-                playOsc('sine', 1500, 0, 0.2, 0.3, 0.5);
-                playOsc('square', 1450, 0, 0.2, 0.1, 0.5);
-                break;
-            case 14: // Mellow Electric Piano
-                playOsc('sine', 349.23, 0, 1.5, 0.6, 1.0); // F4
-                playOsc('sine', 440, 0, 1.5, 0.4, 1.0); // A4
-                playOsc('sine', 523.25, 0, 1.5, 0.4, 1.0); // C5
-                break;
-            case 15: // Sci-Fi Pulse
-                playOsc('sawtooth', 200, 0, 0.3, 0.2, 0.5);
-                playOsc('sawtooth', 200, 0.4, 0.3, 0.2, 0.5);
-                break;
-            case 16: // Crystal
-                playOsc('sine', 3000, 0, 2.0, 0.1, 2.5);
-                playOsc('sine', 3500, 0, 2.0, 0.1, 2.5);
-                break;
-            case 17: // Sunrise Chord
-                playOsc('sine', 261.63, 0, 2.0, 0.4, 1.5); // C4
-                playOsc('sine', 329.63, 0.1, 2.0, 0.3, 1.5); // E4
-                playOsc('sine', 392.00, 0.2, 2.0, 0.3, 1.5); // G4
-                break;
-            case 18: // Arcade Coin
-                playOsc('square', 987.77, 0, 0.1, 0.1, 0.5); // B5
-                playOsc('square', 1318.51, 0.1, 0.3, 0.1, 1.0); // E6
-                break;
-            case 19: // Calming Om
-                playOsc('sine', 130.81, 0, 3.0, 0.8, 3.0); // C3
-                playOsc('sine', 131.5, 0, 3.0, 0.3, 3.0); // Slight detune for beat freq
-                break;
-            default:
-                playOsc('sine', 800, 0, 0.5, 0.5, 1);
+    // --- Clean Remote Audio API Trigger ---
+    playSound(soundId) {
+        if (!this.soundData || this.soundData.length === 0) return;
+        const soundObj = this.soundData.find(s => s.id === String(soundId));
+        if (soundObj) {
+            const audio = new Audio(soundObj.url);
+            audio.play().catch(e => console.log("Audio play blocked natively by browser policies:", e));
         }
     }
 }

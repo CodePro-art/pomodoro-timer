@@ -1,0 +1,22 @@
+[
+  { "id": "0", "name": "Prayer Bowl Strike", "url": "https://actions.google.com/sounds/v1/alarms/prayer_bowl_strike.ogg" },
+  { "id": "1", "name": "Glassy Chimes", "url": "https://actions.google.com/sounds/v1/bells/chimes_glassy.ogg" },
+  { "id": "2", "name": "Electronic Chime", "url": "https://actions.google.com/sounds/v1/bells/electronic_chime.ogg" },
+  { "id": "3", "name": "Toll Bell", "url": "https://actions.google.com/sounds/v1/bells/toll_bell.ogg" },
+  { "id": "4", "name": "Wind Chimes", "url": "https://actions.google.com/sounds/v1/weather/wind_chimes.ogg" },
+  { "id": "5", "name": "Water Droplet", "url": "https://actions.google.com/sounds/v1/water/droplet.ogg" },
+  { "id": "6", "name": "Typewriter Bell", "url": "https://actions.google.com/sounds/v1/office/typewriter_bell.ogg" },
+  { "id": "7", "name": "Mechanical Clock Ring", "url": "https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" },
+  { "id": "8", "name": "Digital Watch Subdued", "url": "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" },
+  { "id": "9", "name": "Soft Beep", "url": "https://actions.google.com/sounds/v1/alarms/beep_short.ogg" },
+  { "id": "10", "name": "Bugle Tune", "url": "https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" },
+  { "id": "11", "name": "Dosimeter Beeps", "url": "https://actions.google.com/sounds/v1/alarms/dosimeter_alarm.ogg" },
+  { "id": "12", "name": "Sonar Ping", "url": "https://actions.google.com/sounds/v1/science_fiction/force_field_loop.ogg" },
+  { "id": "13", "name": "Subtle Coin", "url": "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" },
+  { "id": "14", "name": "Glass Clink", "url": "https://actions.google.com/sounds/v1/foley/glass_clink.ogg" },
+  { "id": "15", "name": "Train Bell", "url": "https://actions.google.com/sounds/v1/transportation/train_bell.ogg" },
+  { "id": "16", "name": "Wood Block", "url": "https://actions.google.com/sounds/v1/office/wood_block.ogg" },
+  { "id": "17", "name": "Ding", "url": "https://actions.google.com/sounds/v1/alarms/phone_alerts_and_rings.ogg" },
+  { "id": "18", "name": "Store Door Chime", "url": "https://actions.google.com/sounds/v1/doors/store_door_chime.ogg" },
+  { "id": "19", "name": "Music Box", "url": "https://actions.google.com/sounds/v1/cartoon/magic_chime.ogg" }
+]
