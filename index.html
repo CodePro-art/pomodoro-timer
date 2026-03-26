@@ -73,7 +73,7 @@
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             </button>
                             <div class="card-title-group">
-                                <input type="text" class="task-name-input" id="current-task-name" value="POMODORO FOCUS" title="Edit Task Name (Multi-session)">
+                                <input type="text" class="task-name-input" id="current-task-name" value="Pomodoro Focus" title="Edit Task Name (Multi-session)">
                                 
                                 <div class="front-edit-time">
                                     <label for="front-time-input">Limit: </label>
@@ -89,15 +89,20 @@
 
                         <!-- Settings Overlay -->
                         <div class="settings-overlay hidden" id="settings-overlay">
+                            <button class="close-overlay-btn" aria-label="Close">×</button>
                             <h3>Settings & Theming</h3>
                             <div class="setting-row">
                                 <label>Theme:</label>
                                 <select id="theme-selector">
-                                    <option value="" disabled selected>Loading themes API...</option>
+                                    <option value="dark">Dark Space (Default)</option>
+                                    <option value="light">Crisp Light</option>
+                                    <option value="ocean">Ocean Breeze</option>
+                                    <option value="sunset">Sunset Glow</option>
+                                    <option value="slate">Slate Minimal</option>
                                 </select>
                             </div>
                             <div class="setting-row">
-                                <label>Alarm Sound:</label>
+                                <label>Alarm Sound (via API):</label>
                                 <select id="sound-selector">
                                     <option value="" disabled selected>Loading audio API...</option>
                                 </select>
@@ -106,8 +111,9 @@
                             <button id="close-settings" class="btn btn-outline" style="margin-top: 15px; width: 100%;">Apply & Close</button>
                         </div>
 
-                        <!-- Calendar Overlay (NEW) -->
+                        <!-- Calendar Overlay -->
                         <div class="calendar-overlay hidden" id="calendar-overlay">
+                            <button class="close-overlay-btn" aria-label="Close">×</button>
                             <h3>Schedule Repeating Task</h3>
                             <div class="setting-row">
                                 <label>Repeat Days:</label>
@@ -131,8 +137,9 @@
                             </div>
                         </div>
 
-                        <!-- Login Modal Overlay (REVISED with Cropping) -->
+                        <!-- Login Modal Overlay -->
                         <div class="login-overlay hidden" id="login-overlay">
+                            <button class="close-overlay-btn" aria-label="Close">×</button>
                             <h3>Profile Setup</h3>
                             <div class="avatar-cropper-container hidden" id="avatar-cropper-container">
                                 <div class="crop-circle" id="crop-circle">
@@ -159,7 +166,6 @@
                             <div class="timer-center-text">
                                 <div class="time-main" id="time-display">25:00</div>
                                 <div class="time-sub">MINUTES REMAINING</div>
-                                <div class="session-info">Focus Session <span id="current-session-label">1</span>/4</div>
                             </div>
                         </div>
 
@@ -181,11 +187,11 @@
                             </button>
                         </div>
 
-                        <!-- Bottom tracker -->
+                        <!-- Bottom tracker for the 10 tasks in the Carousel -->
                         <div class="session-tracker">
-                            <span class="tracker-label">Active Session</span>
+                            <span class="tracker-label">Active Task</span>
                             <div class="dots-container" id="session-dots">
-                                <!-- Dots populated by JS -->
+                                <!-- 10 Dots representing the 10 Tasks populated by JS -->
                             </div>
                             <div class="task-indicator-label">
                                 Task <span id="task-idx-label">1</span>/10

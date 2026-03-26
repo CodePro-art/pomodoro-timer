@@ -11,7 +11,6 @@ class PomodoroApp {
         this.circleCircumference = 2 * Math.PI * 280; // r=280 now
         
         this.selectedSoundIndex = "0";
-        this.themeData = [];
         this.soundData = [];
         this.isGridView = false;
         
@@ -54,7 +53,6 @@ class PomodoroApp {
             frontTimeInput: document.getElementById('front-time-input'),
             display: document.getElementById('time-display'),
             progressCircle: document.getElementById('progress-circle'),
-            sessionLabel: document.getElementById('current-session-label'),
             sessionDots: document.getElementById('session-dots'),
             taskIdxLabel: document.getElementById('task-idx-label'),
             
@@ -96,17 +94,20 @@ class PomodoroApp {
             dayBtns: document.querySelectorAll('.day-btn'),
             scheduleTime: document.getElementById('schedule-time'),
             saveCalendar: document.getElementById('save-calendar'),
-            cancelCalendar: document.getElementById('cancel-calendar')
+            cancelCalendar: document.getElementById('cancel-calendar'),
+
+            // Close Buttons everywhere
+            closeOverlayBtns: document.querySelectorAll('.close-overlay-btn')
         };
     }
 
     async init() {
         this.loadState();
         if (this.tasks.length === 0) {
-            this.addNewTask("POMODORO FOCUS");
+            this.addNewTask("Pomodoro Focus");
         }
         
-        await this.fetchAPIData();
+        await this.fetchSoundAPI();
         
         this.applyProfile();
         this.attachEventListeners();
@@ -119,66 +120,40 @@ class PomodoroApp {
         this.switchTask(0, true); // Immediate render Initial
     }
 
-    async fetchAPIData() {
-        // Fallbacks strictly hardcoded to ensure it WORKS securely even directly off file:// urls
-        const fallbackThemes = [
-          { "id": "dark", "name": "Dark Space (Default)" },
-          { "id": "light", "name": "Crisp Light" },
-          { "id": "ocean", "name": "Ocean Breeze" },
-          { "id": "sunset", "name": "Sunset Glow" },
-          { "id": "slate", "name": "Slate Minimal" }
-        ];
-
+    async fetchSoundAPI() {
+        // Fallback robust MP3s from SoundJay to ensure 0 CORS errors natively
         const fallbackSounds = [
-          { "id": "0", "name": "Prayer Bowl Strike", "url": "https://actions.google.com/sounds/v1/alarms/prayer_bowl_strike.ogg" },
-          { "id": "1", "name": "Glassy Chimes", "url": "https://actions.google.com/sounds/v1/bells/chimes_glassy.ogg" },
-          { "id": "2", "name": "Electronic Chime", "url": "https://actions.google.com/sounds/v1/bells/electronic_chime.ogg" },
-          { "id": "3", "name": "Toll Bell", "url": "https://actions.google.com/sounds/v1/bells/toll_bell.ogg" },
-          { "id": "4", "name": "Wind Chimes", "url": "https://actions.google.com/sounds/v1/weather/wind_chimes.ogg" },
-          { "id": "5", "name": "Water Droplet", "url": "https://actions.google.com/sounds/v1/water/droplet.ogg" },
-          { "id": "6", "name": "Typewriter Bell", "url": "https://actions.google.com/sounds/v1/office/typewriter_bell.ogg" },
-          { "id": "7", "name": "Mechanical Clock Ring", "url": "https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" },
-          { "id": "8", "name": "Digital Watch Subdued", "url": "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" },
-          { "id": "9", "name": "Soft Beep", "url": "https://actions.google.com/sounds/v1/alarms/beep_short.ogg" },
-          { "id": "10", "name": "Bugle Tune", "url": "https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" }
+          { "id": "0", "name": "Classic Bell", "url": "https://www.soundjay.com/misc/bells-1.mp3" },
+          { "id": "1", "name": "Digital Beep", "url": "https://www.soundjay.com/button/beep-01a.mp3" },
+          { "id": "2", "name": "Double Beep", "url": "https://www.soundjay.com/button/beep-04.mp3" },
+          { "id": "3", "name": "Soft Tone", "url": "https://www.soundjay.com/button/beep-06.mp3" },
+          { "id": "4", "name": "Sharp Tone", "url": "https://www.soundjay.com/button/beep-07.mp3" },
+          { "id": "5", "name": "High Beep", "url": "https://www.soundjay.com/button/beep-09.mp3" },
+          { "id": "6", "name": "Low Pulse", "url": "https://www.soundjay.com/button/beep-10.mp3" },
+          { "id": "7", "name": "Ping", "url": "https://www.soundjay.com/button/button-1.mp3" },
+          { "id": "8", "name": "Tap", "url": "https://www.soundjay.com/button/button-3.mp3" },
+          { "id": "9", "name": "Click", "url": "https://www.soundjay.com/button/button-4.mp3" },
+          { "id": "10", "name": "Switch", "url": "https://www.soundjay.com/button/button-5.mp3" },
+          { "id": "11", "name": "Telephone Ring", "url": "https://www.soundjay.com/phone/telephone-ring-01a.mp3" },
+          { "id": "12", "name": "Cymbal", "url": "https://www.soundjay.com/misc/cymbal-1.mp3" },
+          { "id": "13", "name": "Wood Block", "url": "https://www.soundjay.com/misc/wood-block-1.mp3" },
+          { "id": "14", "name": "Triangle", "url": "https://www.soundjay.com/misc/triangle-1.mp3" },
+          { "id": "15", "name": "Tambourine", "url": "https://www.soundjay.com/misc/tambourine-1.mp3" },
+          { "id": "16", "name": "Snare Drum", "url": "https://www.soundjay.com/misc/snare-1.mp3" },
+          { "id": "17", "name": "Magic Wand", "url": "https://www.soundjay.com/misc/magic-chime-01.mp3" },
+          { "id": "18", "name": "Success Chime", "url": "https://www.soundjay.com/misc/success-1.mp3" },
+          { "id": "19", "name": "Fail Tone", "url": "https://www.soundjay.com/misc/fail-1.mp3" }
         ];
 
         try {
-            // Check real network API path based on absolute URI or relative
-            let themesUrl = 'data/themes.json';
-            let soundsUrl = 'data/sounds.json';
-            
-            // Provide explicit workaround if CORS blocks local paths
-            if (location.protocol === 'file:') {
-                // If running local file explicitly bypass real fetch to fallback safely
-                this.themeData = fallbackThemes;
-                this.soundData = fallbackSounds;
-            } else {
-                const themesRes = await fetch(themesUrl);
-                this.themeData = await themesRes.json();
-                
-                const soundsRes = await fetch(soundsUrl);
-                this.soundData = await soundsRes.json();
-            }
+            // Absolute raw github URL prevents ALL cors issues strictly!
+            let soundsUrl = 'https://raw.githubusercontent.com/CodePro-art/pomodoro-timer/main/data/sounds.json';
+            const soundsRes = await fetch(soundsUrl);
+            this.soundData = await soundsRes.json();
         } catch (e) {
-            console.log("API Core Fetch blocked (likely CORS), falling back to integrated data mappings.", e);
-            this.themeData = fallbackThemes;
+            console.log("Remote API Core Fetch blocked remotely, falling back to local fallback array explicitly.", e);
             this.soundData = fallbackSounds;
         }
-
-        // Apply Themes Dropdown
-        this.el.themeSelector.innerHTML = '';
-        this.themeData.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.id;
-            opt.textContent = t.name;
-            this.el.themeSelector.appendChild(opt);
-        });
-        
-        // Reapply saved theme selection
-        const savedTheme = localStorage.getItem('pomodoro_theme') || 'dark';
-        this.el.themeSelector.value = savedTheme;
-        this.el.html.setAttribute('data-theme', savedTheme);
 
         // Apply Sounds Dropdown
         this.el.soundSelector.innerHTML = '';
@@ -192,6 +167,11 @@ class PomodoroApp {
         const savedSound = localStorage.getItem('pomodoro_sound') || "0";
         this.el.soundSelector.value = savedSound;
         this.selectedSoundIndex = savedSound;
+
+        // Theming is hardcoded mechanically by user request so we read directly
+        const savedTheme = localStorage.getItem('pomodoro_theme') || 'dark';
+        this.el.themeSelector.value = savedTheme;
+        this.el.html.setAttribute('data-theme', savedTheme);
     }
 
     // --- State Management ---
@@ -214,8 +194,8 @@ class PomodoroApp {
     saveState() {
         localStorage.setItem('pomodoro_tasks', JSON.stringify(this.tasks));
         localStorage.setItem('pomodoro_profile', JSON.stringify(this.userProfile));
-        localStorage.setItem('pomodoro_theme', this.el.html.getAttribute('data-theme') || 'dark');
-        localStorage.setItem('pomodoro_sound', this.selectedSoundIndex);
+        localStorage.setItem('pomodoro_theme', this.el.themeSelector.value || 'dark');
+        localStorage.setItem('pomodoro_sound', this.el.soundSelector.value || "0");
     }
 
     loadState() {
@@ -263,7 +243,7 @@ class PomodoroApp {
             task.currentSession = 1; // loop or reset
         }
         
-        // Play notification
+        // Play notification reliably with real mp3 API Data!
         this.playSound(this.selectedSoundIndex);
         
         // Auto reset task time softly
@@ -338,20 +318,29 @@ class PomodoroApp {
         this.el.progressCircle.style.stroke = dynamicColor;
         this.el.progressCircle.style.filter = `drop-shadow(0 0 15px rgba(${r}, ${g}, ${b}, 0.6))`;
 
-        // Tracker visual dots
-        this.el.sessionLabel.textContent = t.currentSession;
+        // Tracker visual dots representing 10 tasks specifically per explicit request
         this.el.sessionDots.innerHTML = '';
-        for (let i = 1; i <= t.totalSessions; i++) {
+        for (let i = 0; i < this.maxTasks; i++) {
             const dot = document.createElement('div');
-            dot.className = i <= t.currentSession ? 'dot active' : 'dot';
-            if (i <= t.currentSession) {
-                dot.style.background = dynamicColor;
-                dot.style.boxShadow = `0 0 5px ${dynamicColor}`;
+            // If the dot represents an existing task, style it cleanly.
+            if (i < this.tasks.length) {
+                if (i === this.currentTaskIndex) {
+                    dot.className = 'dot active';
+                    dot.style.background = dynamicColor;
+                    dot.style.boxShadow = `0 0 8px ${dynamicColor}`;
+                } else {
+                    dot.className = 'dot';
+                    dot.style.background = 'rgba(255,255,255,0.4)';
+                }
+            } else {
+                // Dim representation of empty empty tasks remaining up to 10
+                dot.className = 'dot';
+                dot.style.background = 'rgba(255,255,255,0.1)';
             }
             this.el.sessionDots.appendChild(dot);
         }
 
-        this.el.taskIdxLabel.textContent = this.currentTaskIndex + 1;
+        this.el.taskIdxLabel.textContent = this.tasks.length;
     }
 
     renderGrid() {
@@ -439,6 +428,12 @@ class PomodoroApp {
         this.saveState();
     }
 
+    closeAllOverlays() {
+        this.el.settingsOverlay.classList.add('hidden');
+        this.el.loginOverlay.classList.add('hidden');
+        this.el.calendarOverlay.classList.add('hidden');
+    }
+
     // --- Event Listeners Integration ---
     attachEventListeners() {
         // Core buttons
@@ -470,10 +465,16 @@ class PomodoroApp {
             this.openLoginModal();
         });
 
+        // Overlay Close X buttons
+        this.el.closeOverlayBtns.forEach(btn => {
+            btn.addEventListener('click', () => this.closeAllOverlays());
+        });
+
         // Limit Updates
         this.el.taskNameInput.addEventListener('change', (e) => {
             this.tasks[this.currentTaskIndex].name = e.target.value;
             this.saveState();
+            this.renderUI();
         });
         
         this.el.frontTimeInput.addEventListener('change', (e) => {
@@ -492,7 +493,8 @@ class PomodoroApp {
         
         this.el.nextBtn.addEventListener('click', () => {
             if (this.currentTaskIndex === this.tasks.length - 1 && this.tasks.length < this.maxTasks) {
-                this.addNewTask("POMODORO FOCUS");
+                // Ensure default name is proper per explicit instruction
+                this.addNewTask("Pomodoro Focus");
             }
             this.switchTask(this.currentTaskIndex + 1);
         });
@@ -509,7 +511,7 @@ class PomodoroApp {
             this.el.html.setAttribute('data-theme', selectedTheme);
             this.selectedSoundIndex = this.el.soundSelector.value;
             this.saveState();
-            this.el.settingsOverlay.classList.add('hidden');
+            this.closeAllOverlays();
         });
         
         this.el.previewSoundBtn.addEventListener('click', () => {
@@ -535,7 +537,7 @@ class PomodoroApp {
 
             this.saveState();
             this.applyProfile();
-            this.el.loginOverlay.classList.add('hidden');
+            this.closeAllOverlays();
         });
 
         this.initCropperInteractions();
@@ -546,7 +548,7 @@ class PomodoroApp {
             this.el.settingsOverlay.classList.add('hidden');
             this.el.loginOverlay.classList.add('hidden');
             
-            const schedule = this.tasks[this.currentTaskIndex].schedule;
+            const schedule = this.tasks[this.currentTaskIndex].schedule || { days: [], time: '' };
             this.el.scheduleTime.value = schedule.time || '';
             this.el.dayBtns.forEach(btn => {
                 const day = parseInt(btn.getAttribute('data-day'), 10);
@@ -569,15 +571,16 @@ class PomodoroApp {
                 }
             });
             const t = this.tasks[this.currentTaskIndex];
+            if (!t.schedule) t.schedule = { days: [], time: '' };
             t.schedule.days = activeDays;
             t.schedule.time = this.el.scheduleTime.value;
             this.saveState();
-            this.el.calendarOverlay.classList.add('hidden');
+            this.closeAllOverlays();
             alert(`Schedule saved: Active on ${activeDays.length} days at ${t.schedule.time || 'Not Set'}`);
         });
 
         this.el.cancelCalendar.addEventListener('click', () => {
-            this.el.calendarOverlay.classList.add('hidden');
+            this.closeAllOverlays();
         });
     }
 
@@ -705,7 +708,7 @@ class PomodoroApp {
         const soundObj = this.soundData.find(s => s.id === String(soundId));
         if (soundObj) {
             const audio = new Audio(soundObj.url);
-            audio.play().catch(e => console.log("Audio play blocked natively by browser policies:", e));
+            audio.play().catch(e => console.log("Audio play blocked natively by browser policies. Wait for user interaction.", e));
         }
     }
 }
