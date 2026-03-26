@@ -3,59 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Timer</title>
-    <meta name="description" content="A sleek, modern Focus timer to boost your productivity.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Pomodoro Focus Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="pomodoro-container">
-        <header>
-            <h1 class="title">Focus Timer</h1>
-        </header>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-placeholder"></div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    <span>History</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>Profile</span>
+                </a>
+            </nav>
+        </aside>
 
-        <!-- Timer Display Section -->
-        <section class="timer-section" aria-live="polite">
-            <div class="progress-ring-container">
-                <!-- SVG Circular Progress Bar -->
-                <svg class="progress-ring" viewBox="0 0 400 400">
-                    <circle class="progress-ring-bg" cx="200" cy="200" r="180"></circle>
-                    <circle class="progress-ring-fg" cx="200" cy="200" r="180" id="progress-circle"></circle>
-                </svg>
-                
-                <div class="timer-display" id="time-display">25:00</div>
+        <!-- Main Content area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <h1 class="page-title">Dashboard</h1>
+                <div class="user-profile">
+                    <div class="avatar-container">
+                        <img src="https://i.pravatar.cc/150?u=sarah" alt="User Avatar" class="avatar-image">
+                        <span class="status-dot"></span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">Sarah K.</span>
+                        <span class="user-status">Focusing...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Workspace -->
+            <div class="workspace">
+                <!-- Background decorative cards -->
+                <div class="bg-card card-left">
+                    <h3>Cast...</h3>
+                    <div class="bg-ring ring-cyan"></div>
+                </div>
+                <div class="bg-card card-right">
+                    <div class="bg-ring ring-purple"></div>
+                </div>
+                <div class="bg-card card-bottom">
+                    <h3>Rese...</h3>
+                </div>
+
+                <!-- Central Authentic Glass Card -->
+                <div class="pomodoro-card">
+                    <!-- Top header inside card -->
+                    <div class="card-header">
+                        <button class="icon-btn settings-btn" id="settings-toggle-btn" aria-label="Settings">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        </button>
+                        <div class="card-title-group">
+                            <h2 class="card-title">POMODORO FOCUS</h2>
+                            <p class="card-subtitle">STAY PRODUCTIVE</p>
+                        </div>
+                        <button class="icon-btn stats-btn" aria-label="Statistics">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        </button>
+                    </div>
+
+                    <!-- Hidden settings overlay -->
+                    <div class="settings-overlay hidden" id="settings-overlay">
+                        <label>Custom Time (min): <input type="number" id="custom-time-input" value="25" min="1" max="120"></label>
+                        <button id="save-settings" class="btn btn-outline" style="margin-top: 10px; width: 100%;">Save</button>
+                    </div>
+
+                    <!-- Circular Timer Display -->
+                    <div class="timer-circle-wrap">
+                        <svg class="progress-ring-svg" viewBox="0 0 300 300">
+                            <!-- Inner dark track -->
+                            <circle class="ring-track" cx="150" cy="150" r="130"></circle>
+                            <!-- Animated glow progress -->
+                            <circle class="ring-progress" id="progress-circle" cx="150" cy="150" r="130"></circle>
+                        </svg>
+                        
+                        <div class="timer-center-text">
+                            <div class="time-main" id="time-display">25:00</div>
+                            <div class="time-sub">MINUTES REMAINING</div>
+                            <div class="session-info">Focus Session <span id="current-session-label">1</span>/4</div>
+                        </div>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="controls-row">
+                        <div class="btn-group">
+                            <button class="btn btn-outline" id="pause-btn" disabled>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                                <span>PAUSE</span>
+                            </button>
+                            <span class="btn-subtext">24px</span>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" id="play-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                <span>PLAY</span>
+                            </button>
+                            <span class="btn-subtext">32px</span>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-outline" id="reset-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+                                <span>RESET</span>
+                            </button>
+                            <span class="btn-subtext">24px</span>
+                        </div>
+                    </div>
+
+                    <!-- Bottom tracker -->
+                    <div class="session-tracker">
+                        <span class="tracker-label">Active Session</span>
+                        <div class="dots-container" id="session-dots">
+                            <div class="dot active"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="tracker-target">Target: 4 Sessions</span>
+                    </div>
+                </div>
             </div>
-        </section>
-        
-        <!-- Settings Section -->
-        <section class="settings-section">
-            <input 
-                type="number" 
-                id="custom-time-input" 
-                class="settings-input" 
-                min="1" 
-                max="120" 
-                value="25"
-                title="Enter duration in minutes"
-            >
-            <span class="settings-label">min</span>
-        </section>
-
-        <!-- Controls Section -->
-        <section class="controls" aria-label="Timer controls">
-            <button id="play-btn" class="btn btn-icon" aria-label="Play Timer">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            </button>
-            <button id="pause-btn" class="btn btn-icon" aria-label="Pause Timer" disabled>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-            </button>
-            <button id="reset-btn" class="btn btn-icon" aria-label="Reset Timer">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
-            </button>
-        </section>
-    </main>
+        </main>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

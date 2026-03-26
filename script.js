@@ -1,114 +1,107 @@
-/**
- * @fileoverview
- * Modern Focus Timer Implementation.
- * Uses ES6 Class syntax for encapsulation, JSDoc for documentation, 
- * and Web Audio API for synthetic, dependency-free audio notification.
- */
-
 class PomodoroTimer {
-    /**
-     * Initializes a new instance of the Focus Timer, binds DOM elements, 
-     * and sets up event listeners and graphics.
-     */
     constructor() {
-        // Core state
         this.timerId = null;
         this.isRunning = false;
         
-        // Default settings
+        // Timings
         this.defaultMinutes = 25;
         this.timeLeftSeconds = this.defaultMinutes * 60;
         
-        // Visual Progress ring mathematics (Radius = 180 as defined in SVG viewBox)
-        this.circleCircumference = 2 * Math.PI * 180;
+        // Sessions
+        this.currentSession = 1;
+        this.totalSessions = 4;
+        
+        // SVG Ring (radius 130)
+        this.circleCircumference = 2 * Math.PI * 130;
 
-        // DOM Element References
+        // Elements
         this.elements = {
             display: document.getElementById('time-display'),
             playBtn: document.getElementById('play-btn'),
             pauseBtn: document.getElementById('pause-btn'),
             resetBtn: document.getElementById('reset-btn'),
+            
+            // Settings
+            settingsToggle: document.getElementById('settings-toggle-btn'),
+            settingsOverlay: document.getElementById('settings-overlay'),
             timeInput: document.getElementById('custom-time-input'),
-            container: document.querySelector('.pomodoro-container'),
-            progressCircle: document.getElementById('progress-circle')
+            saveSettingsBtn: document.getElementById('save-settings'),
+            
+            // UI/Session
+            container: document.querySelector('.pomodoro-card'),
+            progressCircle: document.getElementById('progress-circle'),
+            sessionLabel: document.getElementById('current-session-label'),
+            sessionDots: document.querySelectorAll('.dot')
         };
 
         this.init();
     }
 
-    /**
-     * Bootstraps the application event listeners and initial UI states.
-     */
     init() {
-        // Setup initial dash array for the SVG outline
         this.elements.progressCircle.style.strokeDasharray = this.circleCircumference;
         this.elements.progressCircle.style.strokeDashoffset = 0;
 
         this.bindEvents();
         this.updateDisplay();
+        this.updateSessionDots();
     }
 
-    /**
-     * Binds internal methods to DOM events.
-     */
     bindEvents() {
         this.elements.playBtn.addEventListener('click', () => this.playTimer());
         this.elements.pauseBtn.addEventListener('click', () => this.pauseTimer());
         this.elements.resetBtn.addEventListener('click', () => this.resetTimer());
         
-        // Listen for user input on the custom time field
-        this.elements.timeInput.addEventListener('change', (e) => this.handleTimeInput(e));
+        // Settings Toggle
+        this.elements.settingsToggle.addEventListener('click', () => {
+            this.elements.settingsOverlay.classList.toggle('hidden');
+        });
+
+        // Save Custom Time
+        this.elements.saveSettingsBtn.addEventListener('click', () => {
+            let newMinutes = parseInt(this.elements.timeInput.value, 10);
+            if (isNaN(newMinutes) || newMinutes < 1) newMinutes = 1;
+            if (newMinutes > 120) newMinutes = 120;
+            
+            this.elements.timeInput.value = newMinutes;
+            this.defaultMinutes = newMinutes;
+            
+            this.elements.settingsOverlay.classList.add('hidden');
+            this.resetTimer();
+        });
     }
 
-    /**
-     * Handles changes to the custom time input field.
-     * Updates the default duration and resets the timer elegantly.
-     * @param {Event} e - The change event from the input field
-     */
-    handleTimeInput(e) {
-        let newMinutes = parseInt(e.target.value, 10);
-        
-        // Validation: ensures the time is within bounds (1 to 120 minutes)
-        if (isNaN(newMinutes) || newMinutes < 1) newMinutes = 1;
-        if (newMinutes > 120) newMinutes = 120;
-        
-        // Update input field safely to reflect possibly clamped values
-        e.target.value = newMinutes;
-        
-        this.defaultMinutes = newMinutes;
-        this.resetTimer(); // Apply new time by completely resetting tracking
-    }
-
-    /**
-     * Renders the current time left onto the HTML DOM, browser tab title,
-     * and recalculates/draws the SVG offset logic.
-     */
     updateDisplay() {
-        // Calculate integers
         const minutes = Math.floor(this.timeLeftSeconds / 60);
         const seconds = this.timeLeftSeconds % 60;
-        
-        // Format to "MM:SS"
         const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
         this.elements.display.textContent = formattedTime;
         document.title = `${formattedTime} - Focus Timer`;
 
-        // Mathematical offset calculated for the Circular Ring Progress Bar
+        // Ring
         const totalSeconds = this.defaultMinutes * 60;
         const fraction = this.timeLeftSeconds / totalSeconds;
-        
-        // As time disappears, offset approaches the circumference size, simulating an emptying ring
         const dashOffset = this.circleCircumference - (fraction * this.circleCircumference);
-        this.elements.progressCircle.style.strokeDashoffset = dashOffset;
+        
+        // Adding a slight min threshold so it doesn't completely vanish at 0
+        this.elements.progressCircle.style.strokeDashoffset = Math.max(0, dashOffset);
+        
+        this.elements.sessionLabel.textContent = this.currentSession;
     }
 
-    /**
-     * Generates a modern double-beep notification sound natively in the browser.
-     * Web Audio API is used to ensure no external MP3 dependencies are required.
-     */
+    updateSessionDots() {
+        this.elements.sessionDots.forEach((dot, index) => {
+            if (index < this.currentSession) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
     playNotificationSound() {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return; // Silent fallback for unsupported legacy browsers
+        if (!AudioContext) return;
         
         const ctx = new AudioContext();
         
@@ -116,12 +109,10 @@ class PomodoroTimer {
             const osc = ctx.createOscillator();
             const gainNode = ctx.createGain();
             
-            // Configuration for a pleasant, non-jarring sine beep
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
             osc.frequency.exponentialRampToValueAtTime(nextFreq, ctx.currentTime + delay + 0.3);
             
-            // Amplitude Envelope creation (fade in/out)
             gainNode.gain.setValueAtTime(0, ctx.currentTime + delay);
             gainNode.gain.linearRampToValueAtTime(0.5, ctx.currentTime + delay + 0.05);
             gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.5);
@@ -133,37 +124,38 @@ class PomodoroTimer {
             osc.stop(ctx.currentTime + delay + 0.5);
         };
         
-        // Play two beeps sequentially
-        triggerBeep(800, 400, 0);       // Immediate Beep
-        triggerBeep(600, 300, 0.25);    // Follow up beep 250ms later
+        triggerBeep(800, 400, 0);
+        triggerBeep(600, 300, 0.25);
     }
 
-    /**
-     * Logic executed when the timer hits zero.
-     * Triggers sound effect and soft resets the interface.
-     */
     finishTimer() {
         clearInterval(this.timerId);
         this.isRunning = false;
         
-        // Update UI states explicitly indicating the session completed
         this.elements.playBtn.disabled = false;
         this.elements.pauseBtn.disabled = true;
         this.elements.container.classList.remove('is-running', 'is-paused');
         
-        // Trigger notification
         this.playNotificationSound();
         
-        // Automatically queue the reset of the UI cleanly
-        this.timeLeftSeconds = this.defaultMinutes * 60;
-        setTimeout(() => this.updateDisplay(), 1500); // 1.5s delay to visually hold zeroes on-screen
+        // Progress session
+        if (this.currentSession < this.totalSessions) {
+            this.currentSession++;
+        } else {
+            this.currentSession = 1; // Reset after all blocks are complete
+        }
+        
+        setTimeout(() => {
+            this.timeLeftSeconds = this.defaultMinutes * 60;
+            this.updateDisplay();
+            this.updateSessionDots();
+        }, 1500);
     }
 
-    /**
-     * Starts the timer from the current point.
-     */
     playTimer() {
         if (this.isRunning) return;
+        
+        this.elements.settingsOverlay.classList.add('hidden'); // Ensure settings are closed
 
         this.timerId = setInterval(() => {
             this.timeLeftSeconds--;
@@ -182,9 +174,6 @@ class PomodoroTimer {
         this.elements.container.classList.remove('is-paused');
     }
 
-    /**
-     * Pauses the timer gracefully.
-     */
     pauseTimer() {
         if (!this.isRunning) return;
 
@@ -198,9 +187,6 @@ class PomodoroTimer {
         this.elements.container.classList.add('is-paused');
     }
 
-    /**
-     * Hard resets the timer back to its configured default state.
-     */
     resetTimer() {
         clearInterval(this.timerId);
         this.isRunning = false;
@@ -208,16 +194,13 @@ class PomodoroTimer {
         this.timeLeftSeconds = this.defaultMinutes * 60;
         this.updateDisplay();
         
-        // Return button UI states
         this.elements.playBtn.disabled = false;
         this.elements.pauseBtn.disabled = true;
         
-        // Remove conditional modifiers from parent layout
         this.elements.container.classList.remove('is-running', 'is-paused');
     }
 }
 
-// Bootstrap application once HTML has fully parsed
 document.addEventListener('DOMContentLoaded', () => {
     new PomodoroTimer();
 });
