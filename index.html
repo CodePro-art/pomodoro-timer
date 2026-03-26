@@ -13,11 +13,14 @@
         <aside class="sidebar">
             <div class="logo-placeholder"></div>
             <nav class="nav-menu">
-                <a href="#" class="nav-item active">
+                <a href="#" class="nav-item active" id="sidebar-dashboard-btn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     <span>Dashboard</span>
                 </a>
-                <!-- Hidden inputs for file uploads used in Phase 2 -->
+                <a href="#" class="nav-item" id="sidebar-focus-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    <span>Focus</span>
+                </a>
                 <input type="file" id="avatar-upload" accept="image/*" style="display:none">
                 <a href="#" class="nav-item" id="sidebar-profile-btn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="nav-icon" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -30,7 +33,7 @@
         <main class="main-content">
             <!-- Header -->
             <header class="top-bar">
-                <h1 class="page-title">Dashboard</h1>
+                <h1 class="page-title" id="top-title">Focus View</h1>
                 <div class="user-profile" id="user-profile-widget" style="cursor: pointer;">
                     <div class="avatar-container">
                         <img src="" alt="User Avatar" class="avatar-image" id="top-avatar-img" style="display: none;">
@@ -48,14 +51,22 @@
 
             <!-- Workspace -->
             <div class="workspace">
-                <!-- Multi-Task Carousel Container -->
-                <div class="carousel-container">
+                
+                <!-- GRID VIEW DASHBOARD (Hidden by default) -->
+                <div class="grid-view hidden" id="grid-view">
+                    <div class="timers-grid" id="timers-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- FOCUS VIEW CAROUSEL -->
+                <div class="carousel-container" id="focus-view">
                     <button class="carousel-arrow left-arrow" id="prev-task-btn" aria-label="Previous Task">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
 
                     <!-- Central Authentic Glass Card -->
-                    <div class="pomodoro-card">
+                    <div class="pomodoro-card transitionable" id="main-focus-card">
                         <!-- Top header inside card -->
                         <div class="card-header">
                             <button class="icon-btn settings-btn" id="settings-toggle-btn" aria-label="Settings">
@@ -70,13 +81,13 @@
                                     <span>min</span>
                                 </div>
                             </div>
-                            <!-- Calendar Schedule Mock Button -->
+                            <!-- Calendar Schedule Button -->
                             <button class="icon-btn calendar-btn" id="calendar-toggle-btn" aria-label="Schedule Task">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                             </button>
                         </div>
 
-                        <!-- Powerful overlay settings -->
+                        <!-- Settings Overlay -->
                         <div class="settings-overlay hidden" id="settings-overlay">
                             <h3>Settings & Theming</h3>
                             <div class="setting-row">
@@ -95,13 +106,46 @@
                             <button id="close-settings" class="btn btn-outline" style="margin-top: 15px; width: 100%;">Apply & Close</button>
                         </div>
 
-                        <!-- Hidden Login Modal Overlay -->
+                        <!-- Calendar Overlay (NEW) -->
+                        <div class="calendar-overlay hidden" id="calendar-overlay">
+                            <h3>Schedule Repeating Task</h3>
+                            <div class="setting-row">
+                                <label>Repeat Days:</label>
+                                <div class="days-selector">
+                                    <button class="day-btn" data-day="0">S</button>
+                                    <button class="day-btn" data-day="1">M</button>
+                                    <button class="day-btn" data-day="2">T</button>
+                                    <button class="day-btn" data-day="3">W</button>
+                                    <button class="day-btn" data-day="4">T</button>
+                                    <button class="day-btn" data-day="5">F</button>
+                                    <button class="day-btn" data-day="6">S</button>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <label>Start Time:</label>
+                                <input type="time" id="schedule-time" class="form-input">
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button id="save-calendar" class="btn btn-primary" style="flex:1;">Save</button>
+                                <button id="cancel-calendar" class="btn btn-outline" style="flex:1;">Cancel</button>
+                            </div>
+                        </div>
+
+                        <!-- Login Modal Overlay (REVISED with Cropping) -->
                         <div class="login-overlay hidden" id="login-overlay">
                             <h3>Profile Setup</h3>
-                            <label>Your Name:</label>
+                            <div class="avatar-cropper-container hidden" id="avatar-cropper-container">
+                                <div class="crop-circle" id="crop-circle">
+                                    <img src="" id="crop-image-preview" alt="Preview">
+                                </div>
+                                <label>Zoom:</label>
+                                <input type="range" id="crop-zoom" min="0.5" max="3" step="0.1" value="1">
+                            </div>
+                            <button class="btn btn-outline" id="upload-avatar-btn">Upload Image</button>
+
+                            <label style="margin-top: 1rem;">Your Name:</label>
                             <input type="text" id="login-name-input" placeholder="e.g. Sarah K." class="form-input">
-                            <label>Avatar Upload:</label>
-                            <button class="btn btn-outline" id="upload-avatar-btn">Choose Image...</button>
+                            
                             <button id="save-login-btn" class="btn btn-primary" style="margin-top: 15px; width: 100%;">Save Profile</button>
                         </div>
 
@@ -119,7 +163,7 @@
                             </div>
                         </div>
 
-                        <!-- Action Controls (Removed 24px/32px texts) -->
+                        <!-- Action Controls -->
                         <div class="controls-row">
                             <button class="btn btn-outline" id="pause-btn" disabled>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>

@@ -34,7 +34,7 @@
     
     --text-primary: #111827;
     --text-secondary: #4b5563;
-    --primary-cyan: #2563eb; /* Blue for light mode */
+    --primary-cyan: #2563eb;
     --ring-track: rgba(37, 99, 235, 0.1);
     --dot-inactive: #d1d5db;
 
@@ -49,6 +49,8 @@
 [data-theme="ocean"] {
     --bg-color: #001220;
     --bg-gradient: radial-gradient(circle at 50% 100%, #003049 0%, #001220 80%);
+    --sidebar-bg: rgba(0, 48, 73, 0.4);
+    --card-bg: rgba(0, 48, 73, 0.4);
     --primary-cyan: #00f5d4;
     --ring-track: rgba(0, 245, 212, 0.1);
     --btn-primary-bg: rgba(0, 245, 212, 0.15);
@@ -60,6 +62,8 @@
 [data-theme="sunset"] {
     --bg-color: #2D142C;
     --bg-gradient: linear-gradient(135deg, #2D142C 0%, #510A32 40%, #801336 100%);
+    --sidebar-bg: rgba(81, 10, 50, 0.4);
+    --card-bg: rgba(81, 10, 50, 0.4);
     --primary-cyan: #fca311;
     --ring-track: rgba(252, 163, 17, 0.1);
     --btn-primary-bg: rgba(252, 163, 17, 0.15);
@@ -99,7 +103,6 @@ body {
     transition: background 0.5s ease, color 0.5s ease;
 }
 
-/* Layout */
 .app-layout {
     display: flex;
     height: 100vh;
@@ -144,6 +147,7 @@ body {
     text-decoration: none;
     color: var(--text-secondary);
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .nav-item span {
@@ -166,7 +170,7 @@ body {
     flex-direction: column;
     padding: 2rem;
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Prevent scrolling of body */
 }
 
 /* Top Bar */
@@ -175,6 +179,7 @@ body {
     justify-content: space-between;
     align-items: center;
     z-index: 10;
+    margin-bottom: 1rem;
 }
 
 .page-title {
@@ -246,7 +251,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* Workspace Carousel */
+/* Workspace */
 .workspace {
     flex: 1;
     position: relative;
@@ -255,6 +260,60 @@ body {
     align-items: center;
 }
 
+/* Grid View (Dashboard mode) */
+.grid-view {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+}
+.grid-view.hidden {
+    display: none;
+}
+.timers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+.grid-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.grid-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-cyan);
+}
+.grid-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.grid-card .grid-time {
+    font-size: 3rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin: 15px 0;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.grid-card .controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Carousel Focus View */
 .carousel-container {
     display: flex;
     align-items: center;
@@ -262,6 +321,9 @@ body {
     gap: 2rem;
     width: 100%;
     max-width: 1000px;
+}
+.carousel-container.hidden {
+    display: none;
 }
 
 .carousel-arrow {
@@ -278,7 +340,6 @@ body {
     backdrop-filter: blur(10px);
     transition: all 0.2s ease;
 }
-
 .carousel-arrow:hover {
     background: rgba(128, 128, 128, 0.2);
     color: var(--text-primary);
@@ -286,6 +347,14 @@ body {
 }
 
 /* Main Pomodoro Card (Massive) */
+.transitionable {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
 .pomodoro-card {
     position: relative;
     z-index: 5;
@@ -296,13 +365,12 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 40px;
-    width: 650px; /* MASSIVE Layout */
+    width: 650px;
     padding: 2.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     box-shadow: var(--card-shadow);
-    transition: background 0.5s ease, border 0.5s ease;
 }
 
 /* Card Header */
@@ -349,7 +417,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
 .front-edit-time input {
     background: rgba(128,128,128,0.1);
     border: 1px solid var(--card-border);
@@ -360,11 +427,6 @@ body {
     padding: 2px 0;
     outline: none;
 }
-.front-edit-time input::-webkit-outer-spin-button,
-.front-edit-time input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
 
 .icon-btn {
     background: transparent;
@@ -374,12 +436,10 @@ body {
     transition: color 0.3s ease;
     padding: 0.5rem;
 }
-.icon-btn:hover {
-    color: var(--text-primary);
-}
+.icon-btn:hover { color: var(--text-primary); }
 
-/* Overlays (Settings & Login) */
-.settings-overlay, .login-overlay {
+/* Overlays (Settings, Login, Calendar) */
+.settings-overlay, .login-overlay, .calendar-overlay {
     position: absolute;
     top: 70px;
     left: 50%;
@@ -395,26 +455,15 @@ body {
     min-width: 250px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.5);
 }
+.hidden { display: none !important; }
 
-.settings-overlay.hidden, .login-overlay.hidden {
-    display: none;
-}
-
-.settings-overlay h3, .login-overlay h3 {
+.settings-overlay h3, .login-overlay h3, .calendar-overlay h3 {
     text-align: center;
     font-size: 1rem;
     margin-bottom: 0.5rem;
 }
-
-.setting-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-.setting-row label, .login-overlay label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
+.setting-row { display: flex; flex-direction: column; gap: 0.5rem; }
+.setting-row label, .login-overlay label, .calendar-overlay label { font-size: 0.8rem; color: var(--text-secondary); }
 
 select, .form-input {
     background: rgba(128, 128, 128, 0.1);
@@ -425,6 +474,38 @@ select, .form-input {
     font-family: inherit;
     width: 100%;
 }
+
+/* Avatar Cropper Preview */
+.avatar-cropper-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.crop-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.3);
+    overflow: hidden;
+    position: relative;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.crop-circle img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transform-origin: center;
+}
+
+/* Calendar Day Buttons */
+.days-selector { display: flex; gap: 5px; }
+.day-btn { flex: 1; padding: 5px; border-radius: 5px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; transition: background 0.2s; }
+.day-btn.active { background: var(--primary-cyan); color: #000; font-weight: bold; }
 
 /* X2 Circular Timer */
 .timer-circle-wrap {
@@ -443,18 +524,15 @@ select, .form-input {
 
 .progress-ring-svg circle {
     fill: none;
-    stroke-width: 20; /* Scaled up track */
+    stroke-width: 20;
     stroke-linecap: round;
 }
 
-.ring-track {
-    stroke: var(--ring-track);
-}
-
+.ring-track { stroke: var(--ring-track); }
 .ring-progress {
-    stroke: var(--primary-cyan); /* overridden tightly by JS */
+    stroke: var(--primary-cyan);
     stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear; /* Color is immediate via JS now */
+    transition: stroke-dashoffset 1s linear; 
     filter: drop-shadow(0 0 15px currentColor);
 }
 
@@ -488,10 +566,7 @@ select, .form-input {
     margin-bottom: 1rem;
 }
 
-.session-info {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
+.session-info { font-size: 0.85rem; color: var(--text-secondary); }
 
 /* Action Controls */
 .controls-row {
@@ -518,25 +593,10 @@ select, .form-input {
     color: var(--text-primary);
 }
 
-.btn-large {
-    padding: 1rem 2rem;
-    font-size: 0.95rem;
-    border-radius: 40px;
-}
-
-.btn:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-.btn-outline {
-    background: var(--btn-outline-bg);
-    border: 1px solid var(--btn-outline-border);
-}
-
-.btn-outline:hover:not(:disabled) {
-    background: var(--btn-outline-hover-bg);
-    border-color: rgba(255, 255, 255, 0.3);
-}
+.btn-large { padding: 1rem 2rem; font-size: 0.95rem; border-radius: 40px; }
+.btn:active:not(:disabled) { transform: scale(0.95); }
+.btn-outline { background: var(--btn-outline-bg); border: 1px solid var(--btn-outline-border); }
+.btn-outline:hover:not(:disabled) { background: var(--btn-outline-hover-bg); border-color: rgba(255, 255, 255, 0.3); }
 
 .btn-primary {
     background: var(--btn-primary-bg);
@@ -544,16 +604,11 @@ select, .form-input {
     color: var(--btn-primary-color);
     box-shadow: var(--btn-primary-shadow);
 }
-
 .btn-primary:hover:not(:disabled) {
     background: rgba(0, 224, 255, 0.3);
     box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
 }
-
-.btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 /* Bottom tracker */
 .session-tracker {
@@ -565,66 +620,28 @@ select, .form-input {
     font-size: 0.75rem;
     color: var(--text-secondary);
 }
-
-.dots-container {
-    display: flex;
-    gap: 0.35rem;
-}
-
-.dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--dot-inactive);
-}
-
-.dot.active {
-    background: var(--primary-cyan); /* overridden tightly by JS if needed, but CSS is fine */
-    box-shadow: 0 0 5px var(--primary-cyan);
-}
+.dots-container { display: flex; gap: 0.35rem; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-inactive); }
+.dot.active { background: var(--primary-cyan); box-shadow: 0 0 5px var(--primary-cyan); }
 
 /* Responsive Scaling down for mobile/small laptops */
 @media (max-width: 1024px) {
-    .pomodoro-card {
-        width: 500px;
-        padding: 2rem;
-    }
-    .timer-circle-wrap {
-        width: 350px;
-        height: 350px;
-    }
+    .pomodoro-card { width: 500px; padding: 2rem; }
+    .timer-circle-wrap { width: 350px; height: 350px; }
     .time-main { font-size: 5rem; }
 }
 
 @media (max-width: 768px) {
-    .app-layout {
-        flex-direction: column-reverse;
-    }
-    .sidebar {
-        width: 100%;
-        height: 70px;
-        flex-direction: row;
-        justify-content: center;
-        gap: 3rem;
-        padding: 0;
-        border-right: none;
-        border-top: 1px solid var(--card-border);
-    }
+    .app-layout { flex-direction: column-reverse; }
+    .sidebar { width: 100%; height: 70px; flex-direction: row; justify-content: center; gap: 3rem; padding: 0; border-right: none; border-top: 1px solid var(--card-border); }
     .logo-placeholder { display: none; }
     .carousel-container { gap: 0.5rem; }
     .carousel-arrow { width: 36px; height: 36px; }
 }
 
 @media (max-width: 480px) {
-    .pomodoro-card {
-        width: 95vw;
-        border-radius: 20px;
-        padding: 1.5rem;
-    }
-    .timer-circle-wrap {
-        width: 280px;
-        height: 280px;
-    }
+    .pomodoro-card { width: 95vw; border-radius: 20px; padding: 1.5rem; }
+    .timer-circle-wrap { width: 280px; height: 280px; }
     .time-main { font-size: 4rem; }
     .btn-large { padding: 0.75rem 1.5rem; font-size: 0.8rem; }
 }
