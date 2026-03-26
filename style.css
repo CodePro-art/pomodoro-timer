@@ -488,6 +488,10 @@ select, .form-input {
     font-family: inherit;
     width: 100%;
 }
+select option {
+    background-color: #ffffff;
+    color: #000000;
+}
 
 /* Avatar Cropper Preview */
 .avatar-cropper-container {
