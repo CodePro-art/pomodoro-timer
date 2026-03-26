@@ -25,7 +25,8 @@ class PomodoroTimer {
         // DOM Element References
         this.elements = {
             display: document.getElementById('time-display'),
-            startBtn: document.getElementById('start-btn'),
+            playBtn: document.getElementById('play-btn'),
+            pauseBtn: document.getElementById('pause-btn'),
             resetBtn: document.getElementById('reset-btn'),
             timeInput: document.getElementById('custom-time-input'),
             container: document.querySelector('.pomodoro-container'),
@@ -51,7 +52,8 @@ class PomodoroTimer {
      * Binds internal methods to DOM events.
      */
     bindEvents() {
-        this.elements.startBtn.addEventListener('click', () => this.toggleTimer());
+        this.elements.playBtn.addEventListener('click', () => this.playTimer());
+        this.elements.pauseBtn.addEventListener('click', () => this.pauseTimer());
         this.elements.resetBtn.addEventListener('click', () => this.resetTimer());
         
         // Listen for user input on the custom time field
@@ -145,9 +147,9 @@ class PomodoroTimer {
         this.isRunning = false;
         
         // Update UI states explicitly indicating the session completed
-        this.elements.startBtn.textContent = 'Start';
-        this.elements.startBtn.classList.replace('btn-secondary', 'btn-primary');
-        this.elements.container.classList.remove('is-running');
+        this.elements.playBtn.disabled = false;
+        this.elements.pauseBtn.disabled = true;
+        this.elements.container.classList.remove('is-running', 'is-paused');
         
         // Trigger notification
         this.playNotificationSound();
@@ -158,36 +160,42 @@ class PomodoroTimer {
     }
 
     /**
-     * Toggles the timer running state (Start vs Pause).
+     * Starts the timer from the current point.
      */
-    toggleTimer() {
-        if (this.isRunning) {
-            // Initiate Pause Mode
-            clearInterval(this.timerId);
-            this.elements.startBtn.textContent = 'Resume';
-            this.elements.startBtn.classList.replace('btn-secondary', 'btn-primary');
+    playTimer() {
+        if (this.isRunning) return;
+
+        this.timerId = setInterval(() => {
+            this.timeLeftSeconds--;
+            this.updateDisplay();
             
-            this.elements.container.classList.remove('is-running');
-            this.elements.container.classList.add('is-paused');
-        } else {
-            // Initiate Active Running Mode
-            this.timerId = setInterval(() => {
-                this.timeLeftSeconds--;
-                this.updateDisplay();
-                
-                if (this.timeLeftSeconds <= 0) {
-                    this.finishTimer();
-                }
-            }, 1000);
-            
-            this.elements.startBtn.textContent = 'Pause';
-            this.elements.startBtn.classList.replace('btn-primary', 'btn-secondary');
-            
-            this.elements.container.classList.add('is-running');
-            this.elements.container.classList.remove('is-paused');
-        }
+            if (this.timeLeftSeconds <= 0) {
+                this.finishTimer();
+            }
+        }, 1000);
         
-        this.isRunning = !this.isRunning;
+        this.isRunning = true;
+        this.elements.playBtn.disabled = true;
+        this.elements.pauseBtn.disabled = false;
+        
+        this.elements.container.classList.add('is-running');
+        this.elements.container.classList.remove('is-paused');
+    }
+
+    /**
+     * Pauses the timer gracefully.
+     */
+    pauseTimer() {
+        if (!this.isRunning) return;
+
+        clearInterval(this.timerId);
+        this.isRunning = false;
+        
+        this.elements.playBtn.disabled = false;
+        this.elements.pauseBtn.disabled = true;
+        
+        this.elements.container.classList.remove('is-running');
+        this.elements.container.classList.add('is-paused');
     }
 
     /**
@@ -201,9 +209,8 @@ class PomodoroTimer {
         this.updateDisplay();
         
         // Return button UI states
-        this.elements.startBtn.textContent = 'Start';
-        this.elements.startBtn.classList.remove('btn-secondary');
-        this.elements.startBtn.classList.add('btn-primary');
+        this.elements.playBtn.disabled = false;
+        this.elements.pauseBtn.disabled = true;
         
         // Remove conditional modifiers from parent layout
         this.elements.container.classList.remove('is-running', 'is-paused');

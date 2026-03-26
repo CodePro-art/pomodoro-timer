@@ -31,7 +31,6 @@
         
         <!-- Settings Section -->
         <section class="settings-section">
-            <label for="custom-time-input" class="settings-label">Set Time (Minutes):</label>
             <input 
                 type="number" 
                 id="custom-time-input" 
@@ -41,12 +40,20 @@
                 value="25"
                 title="Enter duration in minutes"
             >
+            <span class="settings-label">min</span>
         </section>
 
         <!-- Controls Section -->
         <section class="controls" aria-label="Timer controls">
-            <button id="start-btn" class="btn btn-primary" aria-label="Start Timer">Start</button>
-            <button id="reset-btn" class="btn btn-secondary" aria-label="Reset Timer">Reset</button>
+            <button id="play-btn" class="btn btn-icon" aria-label="Play Timer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </button>
+            <button id="pause-btn" class="btn btn-icon" aria-label="Pause Timer" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+            <button id="reset-btn" class="btn btn-icon" aria-label="Reset Timer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+            </button>
         </section>
     </main>
     <script src="script.js"></script>
