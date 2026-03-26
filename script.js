@@ -121,28 +121,28 @@ class PomodoroApp {
     }
 
     async fetchSoundAPI() {
-        // Fallback robust MP3s from SoundJay to ensure 0 CORS errors natively
+        // Full 20 configurations fallback if JSON JSON fetch is blocked by CORS
         const fallbackSounds = [
-          { "id": "0", "name": "Classic Bell", "url": "https://www.soundjay.com/misc/bells-1.mp3" },
-          { "id": "1", "name": "Digital Beep", "url": "https://www.soundjay.com/button/beep-01a.mp3" },
-          { "id": "2", "name": "Double Beep", "url": "https://www.soundjay.com/button/beep-04.mp3" },
-          { "id": "3", "name": "Soft Tone", "url": "https://www.soundjay.com/button/beep-06.mp3" },
-          { "id": "4", "name": "Sharp Tone", "url": "https://www.soundjay.com/button/beep-07.mp3" },
-          { "id": "5", "name": "High Beep", "url": "https://www.soundjay.com/button/beep-09.mp3" },
-          { "id": "6", "name": "Low Pulse", "url": "https://www.soundjay.com/button/beep-10.mp3" },
-          { "id": "7", "name": "Ping", "url": "https://www.soundjay.com/button/button-1.mp3" },
-          { "id": "8", "name": "Tap", "url": "https://www.soundjay.com/button/button-3.mp3" },
-          { "id": "9", "name": "Click", "url": "https://www.soundjay.com/button/button-4.mp3" },
-          { "id": "10", "name": "Switch", "url": "https://www.soundjay.com/button/button-5.mp3" },
-          { "id": "11", "name": "Telephone Ring", "url": "https://www.soundjay.com/phone/telephone-ring-01a.mp3" },
-          { "id": "12", "name": "Cymbal", "url": "https://www.soundjay.com/misc/cymbal-1.mp3" },
-          { "id": "13", "name": "Wood Block", "url": "https://www.soundjay.com/misc/wood-block-1.mp3" },
-          { "id": "14", "name": "Triangle", "url": "https://www.soundjay.com/misc/triangle-1.mp3" },
-          { "id": "15", "name": "Tambourine", "url": "https://www.soundjay.com/misc/tambourine-1.mp3" },
-          { "id": "16", "name": "Snare Drum", "url": "https://www.soundjay.com/misc/snare-1.mp3" },
-          { "id": "17", "name": "Magic Wand", "url": "https://www.soundjay.com/misc/magic-chime-01.mp3" },
-          { "id": "18", "name": "Success Chime", "url": "https://www.soundjay.com/misc/success-1.mp3" },
-          { "id": "19", "name": "Fail Tone", "url": "https://www.soundjay.com/misc/fail-1.mp3" }
+          { "id": "0", "name": "1. Classic Double Beep" },
+          { "id": "1", "name": "2. Soft Marimba" },
+          { "id": "2", "name": "3. Bright Chime" },
+          { "id": "3", "name": "4. Digital Watch" },
+          { "id": "4", "name": "5. Analog Bell" },
+          { "id": "5", "name": "6. Synth Pad Swell" },
+          { "id": "6", "name": "7. Deep Bass Pluck" },
+          { "id": "7", "name": "8. Ethereal Glass" },
+          { "id": "8", "name": "9. Gentle Tap" },
+          { "id": "9", "name": "10. Triangle Ding" },
+          { "id": "10", "name": "11. Echoing Chime" },
+          { "id": "11", "name": "12. 8-Bit Jump" },
+          { "id": "12", "name": "13. Wooden Block" },
+          { "id": "13", "name": "14. Space Radar" },
+          { "id": "14", "name": "15. Mellow Piano" },
+          { "id": "15", "name": "16. Sci-Fi Pulse" },
+          { "id": "16", "name": "17. Crystal Resonate" },
+          { "id": "17", "name": "18. Sunrise Chord" },
+          { "id": "18", "name": "19. Arcade Coin" },
+          { "id": "19", "name": "20. Calming Om" }
         ];
 
         try {
@@ -705,10 +705,122 @@ class PomodoroApp {
 
     playSound(soundId) {
         if (!this.soundData || this.soundData.length === 0) return;
-        const soundObj = this.soundData.find(s => s.id === String(soundId));
-        if (soundObj) {
-            const audio = new Audio(soundObj.url);
-            audio.play().catch(e => console.log("Audio play blocked natively by browser policies. Wait for user interaction.", e));
+        
+        let index = parseInt(soundId, 10);
+        if (isNaN(index)) index = 0;
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        if (!this.audioContext) this.audioContext = new AudioContext(); // persist context
+        const ctx = this.audioContext;
+        
+        // If context is suspended (browser policy), attempt to resume
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(e => console.log("Audio Context blocked by browser.", e));
+        }
+
+        const playOsc = (type, freq, timeOffset, duration, vol, decayMultiplier) => {
+            try {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + timeOffset);
+                
+                gain.gain.setValueAtTime(0, ctx.currentTime + timeOffset);
+                gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + timeOffset + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + timeOffset + duration * decayMultiplier);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime + timeOffset);
+                osc.stop(ctx.currentTime + timeOffset + duration);
+            } catch (err) {
+                console.log("Synthesizer error ignored.", err);
+            }
+        };
+
+        switch(index) {
+            case 0: // Classic Double Beep
+                playOsc('sine', 800, 0, 0.5, 0.5, 1);
+                playOsc('sine', 800, 0.25, 0.5, 0.5, 1);
+                break;
+            case 1: // Marimba
+                playOsc('sine', 440, 0, 0.4, 0.8, 0.5);
+                playOsc('sine', 554, 0.15, 0.4, 0.6, 0.5);
+                break;
+            case 2: // Bright Chime 
+                playOsc('triangle', 1200, 0, 1.0, 0.4, 1.5);
+                playOsc('triangle', 1600, 0.1, 1.0, 0.2, 1.5);
+                break;
+            case 3: // Digital Watch
+                playOsc('square', 2400, 0, 0.1, 0.1, 0.1);
+                playOsc('square', 2400, 0.15, 0.1, 0.1, 0.1);
+                break;
+            case 4: // Analog Bell
+                playOsc('sine', 600, 0, 2.0, 0.6, 2.0);
+                playOsc('sine', 1200, 0, 1.5, 0.2, 1.5);
+                break;
+            case 5: // Synth Pad Swell
+                playOsc('sawtooth', 300, 0, 2.0, 0.2, 1.0);
+                break;
+            case 6: // Deep Bass Pluck
+                playOsc('sine', 100, 0, 0.5, 0.8, 0.3);
+                playOsc('triangle', 200, 0.05, 0.5, 0.4, 0.3);
+                break;
+            case 7: // Ethereal Glass
+                playOsc('sine', 2000, 0, 1.5, 0.3, 2.0);
+                playOsc('sine', 2500, 0.2, 1.5, 0.2, 2.0);
+                break;
+            case 8: // Gentle Tap
+                playOsc('triangle', 300, 0, 0.1, 0.6, 0.2);
+                break;
+            case 9: // Triangle Ding
+                playOsc('triangle', 880, 0, 1.5, 0.5, 1.2);
+                break;
+            case 10: // Echoing Chime
+                playOsc('sine', 1000, 0, 0.5, 0.5, 1);
+                playOsc('sine', 1000, 0.3, 0.5, 0.25, 1);
+                playOsc('sine', 1000, 0.6, 0.5, 0.1, 1);
+                break;
+            case 11: // 8-Bit Jump
+                playOsc('square', 400, 0, 0.2, 0.1, 0.5);
+                playOsc('square', 600, 0.1, 0.2, 0.1, 0.5);
+                break;
+            case 12: // Wooden Block
+                playOsc('square', 300, 0, 0.1, 0.5, 0.1);
+                break;
+            case 13: // Space Radar
+                playOsc('sine', 1500, 0, 0.2, 0.3, 0.5);
+                playOsc('square', 1450, 0, 0.2, 0.1, 0.5);
+                break;
+            case 14: // Mellow Electric Piano
+                playOsc('sine', 349.23, 0, 1.5, 0.6, 1.0);
+                playOsc('sine', 440, 0, 1.5, 0.4, 1.0);
+                playOsc('sine', 523.25, 0, 1.5, 0.4, 1.0);
+                break;
+            case 15: // Sci-Fi Pulse
+                playOsc('sawtooth', 200, 0, 0.3, 0.2, 0.5);
+                playOsc('sawtooth', 200, 0.4, 0.3, 0.2, 0.5);
+                break;
+            case 16: // Crystal
+                playOsc('sine', 3000, 0, 2.0, 0.1, 2.5);
+                playOsc('sine', 3500, 0, 2.0, 0.1, 2.5);
+                break;
+            case 17: // Sunrise Chord
+                playOsc('sine', 261.63, 0, 2.0, 0.4, 1.5);
+                playOsc('sine', 329.63, 0.1, 2.0, 0.3, 1.5);
+                playOsc('sine', 392.00, 0.2, 2.0, 0.3, 1.5); 
+                break;
+            case 18: // Arcade Coin
+                playOsc('square', 987.77, 0, 0.1, 0.1, 0.5);
+                playOsc('square', 1318.51, 0.1, 0.3, 0.1, 1.0);
+                break;
+            case 19: // Calming Om
+                playOsc('sine', 130.81, 0, 3.0, 0.8, 3.0);
+                playOsc('sine', 131.5, 0, 3.0, 0.3, 3.0); // detune
+                break;
+            default:
+                playOsc('sine', 800, 0, 0.5, 0.5, 1);
         }
     }
 }
